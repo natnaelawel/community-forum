@@ -11,12 +11,19 @@ router.get('/google',passport.authenticate('google', {scope: ['profile', 'email'
 router.get('/google/callback', (req, res, next)=>{
     passport.authenticate('google', async (err, user) =>{
         if(err){
-            return next(err);
+            console.log('error is ', err);
+            res.redirect(`${process.env.CLIENT_ERROR_REDIRECT}${err.message}`);
+            // return next(err);
         }
         //create JWT token with the user
-
-        const token = await create(user);
-        res.json({token});
+        try {
+            const token = await create(user);
+            // res.json({token});
+            res.redirect(`${process.env.CLIENT_REDIRECT}${token}`);
+            
+        } catch (error) {
+            res.redirect(`${process.env.CLIENT_ERROR_REDIRECT}${error.message}`);
+        }
 
         // if(!user){
         //     return res.redirect('/login');
