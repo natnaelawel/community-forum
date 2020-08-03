@@ -17,15 +17,16 @@ const querySchema = Joi.object().keys({
 
 module.exports = {
   findByEmail(email) {
-    db("users").where("email", email).first();
+    return db("users").where("email", email).first();
   },
-  update(id, user) {
-    const result = Joi.validate(user, querySchema);
+  async update(id, user) {
+    // const result = Joi.validate(user, querySchema);
     // validator.body(querySchema,user);
     
     // if (result.error === null) {
     if (validator.query(querySchema, user)) {
-      return db("users").where("id", id).update(user);
+      const rows = await db("users").where("id", id).update(user, "*");
+      return rows[0];
     } else {
       return Promise.reject(result.error);
     }

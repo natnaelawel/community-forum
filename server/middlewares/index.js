@@ -1,3 +1,40 @@
+const {verify} = require('../auth/utils');
+
+async function checkAuthHeaderSetUser(req, res, next){
+    const authorization = req.get('authorization');
+    if(authorization){
+        try {
+            const token = authorization.split(' ')[1];
+            const user = await verify(token);
+            req.user = user;
+            console.log(user);
+            
+        } catch (error) {
+            console.error(error);
+            next();
+        }
+    }
+    next();
+}
+
+async function checkAuthHeaderSetUserUnAuthorized(req, res, next){
+    const authorization = req.get('authorization');
+    if(authorization){
+        try {
+            const token = authorization.split(' ')[1];
+            const user = await verify(token);
+            req.user = user;
+            console.log(user);
+            next();
+            
+        } catch (error) {
+            console.error(error);
+        }
+    }
+        res.status(401);
+        next(new Error('UnAuthorized '));
+}
+
 function notFound(req, res, next){
     const error = new Error('Not Found -- ' + req.originalUrl);
 
@@ -16,5 +53,7 @@ function errorHandler(error, req, res, next){
 
 module.exports = {
     notFound,
-    errorHandler
+    errorHandler,
+    checkAuthHeaderSetUser,
+    checkAuthHeaderSetUserUnAuthorized
 };

@@ -5,7 +5,7 @@ const logger = require('morgan');
 const dotenv = require('dotenv');
 const passport = require('passport');
 
-const { notFound, errorHandler} = require('./middlewares');
+const { notFound, errorHandler, checkAuthHeaderSetUser, checkAuthHeaderSetUserUnAuthorized} = require('./middlewares');
 
 dotenv.config();
 
@@ -24,14 +24,14 @@ const auth = require('./auth');
 
 // our routes goes here
 
-app.use('/auth', auth);
+app.use(checkAuthHeaderSetUser);
 
-app.get('/', (req, res) =>{
+app.use('/auth', auth);
+app.get('/',checkAuthHeaderSetUserUnAuthorized, (req, res) =>{
     res.json({
         message: 'welcome to community api 🌈 💚',
     });
 });
-
 
 
 app.use(notFound);
